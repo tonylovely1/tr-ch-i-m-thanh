@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Khám Phá Thế Giới Âm Thanh - Khoa Học Lớp 4</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Quicksand', sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .art-3d-box {
+      width: 100%;
+      height: 100%;
+      min-height: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 40%, #1e1b4b 0%, #0f172a 100%);
+      border-radius: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .art-3d-box svg {
+      width: 100%;
+      height: 100%;
+      max-height: 290px;
+      filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.4));
+    }
+    .draggable-card {
+      touch-action: none;
+      cursor: grab;
+    }
+    .draggable-card:active {
+      cursor: grabbing;
+    }
+    .drop-zone-active {
+      border-color: #6366f1 !important;
+      background-color: #e0e7ff !important;
+      transform: scale(1.02);
+    }
+    @keyframes soundwave {
+      0% { transform: scale(0.9); opacity: 0.9; }
+      50% { transform: scale(1.06); opacity: 0.5; }
+      100% { transform: scale(0.9); opacity: 0.9; }
+    }
+    .anim-pulse-wave {
+      animation: soundwave 2.2s infinite ease-in-out;
+    }
+    @keyframes float-icon {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(3deg); }
+    }
+    .anim-float {
+      animation: float-icon 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 min-h-screen text-slate-800 flex flex-col justify-between">
+
+  <!-- Header -->
+  <header class="w-full bg-white/90 backdrop-blur-md border-b border-indigo-200 sticky top-0 z-50 px-4 py-3 shadow-sm">
+    <div class="max-w-5xl mx-auto flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-300">
+          <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.5A2.25 2.25 0 002.25 9.75v4.5a2.25 2.25 0 002.25 2.25h1.94l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 01-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z"/>
+            <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.06 4.5 4.5 0 000-6.365.75.75 0 010-1.061z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-extrabold text-slate-800 tracking-tight">KHOA HỌC 4: THẾ GIỚI ÂM THANH KỲ THÚ</h1>
+          <p class="text-xs font-bold text-indigo-600">Sự rung động • Môi trường truyền âm • Độ to của âm</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="bg-indigo-50 border border-indigo-200 px-3.5 py-1.5 rounded-xl flex items-center gap-2">
+          <span class="text-amber-500 text-lg">⭐</span>
+          <span class="text-xs font-extrabold text-indigo-900 uppercase hidden sm:inline">Điểm:</span>
+          <span id="score-display" class="font-extrabold text-indigo-900 text-base">0</span>
+        </div>
+        <button id="toggle-sound-btn" class="w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-700 transition shadow-sm" title="Bật/Tắt âm">
+          <span id="sound-icon" class="text-lg">🔊</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Vùng nội dung chính -->
+  <main class="max-w-4xl w-full mx-auto p-4 md:py-6 flex-grow flex flex-col justify-center">
+
+    <!-- MÀN HÌNH BẮT ĐẦU -->
+    <div id="screen-start" class="bg-white rounded-3xl p-6 md:p-10 shadow-2xl border border-indigo-100 text-center flex flex-col items-center">
+      
+      <!-- Minh họa 3D Giới thiệu chủ đề Âm Thanh -->
+      <div class="w-48 h-48 md:w-56 md:h-56 mb-5 anim-float">
+        <svg viewBox="0 0 200 200" class="w-full h-full filter drop-shadow-xl">
+          <defs>
+            <radialGradient id="speakerGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#a855f7" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.2"/>
+            </radialGradient>
+            <linearGradient id="drum3D" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#f43f5e"/><stop offset="100%" stop-color="#be123c"/>
+            </linearGradient>
+          </defs>
+          <circle cx="100" cy="100" r="75" fill="url(#speakerGlow)"/>
+          <!-- Vành sóng âm 3D đồng tâm -->
+          <circle cx="100" cy="100" r="88" fill="none" stroke="#818cf8" stroke-width="3" stroke-dasharray="8 6" opacity="0.6"/>
+          <!-- Chiếc loa phát thanh 3D -->
+          <polygon points="50,85 75,85 105,60 105,140 75,115 50,115" fill="#4338ca"/>
+          <path d="M120,80 Q135,100 120,120" stroke="#f472b6" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <path d="M135,68 Q160,100 135,132" stroke="#fb7185" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <!-- Mặt trống rung 3D -->
+          <ellipse cx="140" cy="140" rx="35" ry="16" fill="url(#drum3D)"/>
+          <polygon points="105,140 105,160 175,160 175,140" fill="#9f1239"/>
+          <!-- Hạt đậu đang nảy tưng bừng -->
+          <circle cx="130" cy="125" r="4" fill="#facc15"/>
+          <circle cx="145" cy="120" r="4" fill="#facc15"/>
+          <circle cx="155" cy="127" r="4" fill="#facc15"/>
+        </svg>
+      </div>
+
+      <h2 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">BÍ MẬT CỦA ÂM THANH</h2>
+      
+      <!-- Hộp ghi nhớ kiến thức cốt lõi từ sách -->
+      <div class="w-full max-w-xl bg-gradient-to-r from-indigo-50 via-purple-50 to-pink-50 border-2 border-indigo-200 rounded-2xl p-4 text-left my-4 shadow-sm">
+        <h4 class="font-extrabold text-indigo-900 text-sm flex items-center gap-2 mb-2">
+          <span>📖</span> KIẾN THỨC BÀI HỌC CẦN GHI NHỚ:
+        </h4>
+        <ul class="text-xs md:text-sm font-semibold text-slate-700 space-y-2">
+          <li class="flex items-start gap-2">
+            <span class="text-indigo-600 font-bold">•</span>
+            <span><strong>Các vật phát ra âm thanh đều rung động.</strong></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-purple-600 font-bold">•</span>
+            <span><strong>Âm thanh có thể truyền qua chất khí, chất lỏng, chất rắn.</strong></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-pink-600 font-bold">•</span>
+            <span><strong>Khi ở gần nguồn âm sẽ nghe thấy âm thanh to hơn khi ở xa nguồn âm.</strong></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-md mb-6">
+        <div class="p-3.5 rounded-2xl bg-indigo-50 border-2 border-indigo-200 text-left flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-indigo-600 text-white font-black flex items-center justify-center text-lg shadow">6</div>
+          <div>
+            <div class="font-extrabold text-slate-800 text-sm">Phần 1: Trắc nghiệm</div>
+            <div class="text-xs text-slate-500 font-semibold">Khám phá bản chất âm thanh</div>
+          </div>
+        </div>
+        <div class="p-3.5 rounded-2xl bg-purple-50 border-2 border-purple-200 text-left flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-600 text-white font-black flex items-center justify-center text-lg shadow">4</div>
+          <div>
+            <div class="font-extrabold text-slate-800 text-sm">Phần 2: Kéo - Thả hình</div>
+            <div class="text-xs text-slate-500 font-semibold">Tương tác trực quan 3D</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-start" class="px-10 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:to-pink-700 text-white font-extrabold text-lg rounded-2xl shadow-xl hover:shadow-indigo-400/40 transform hover:-translate-y-0.5 active:translate-y-0 transition flex items-center gap-3">
+        <span>BẮT ĐẦU CHƠI NGAY</span>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      </button>
+    </div>
+
+    <!-- MÀN HÌNH CHƠI GAME CHÍNH -->
+    <div id="screen-game" class="hidden flex-col gap-4">
+      
+      <!-- Thanh tiến trình -->
+      <div class="bg-white/90 backdrop-blur rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-col gap-2">
+        <div class="flex justify-between items-center text-sm font-bold">
+          <span id="badge-section" class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-lg text-xs font-black uppercase tracking-wide">
+            Phần 1: Trắc nghiệm
+          </span>
+          <span class="text-slate-500">Câu <span id="current-question-num" class="text-indigo-900 font-extrabold text-base">1</span> / 10</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+          <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+        </div>
+      </div>
+
+      <!-- Thẻ câu hỏi -->
+      <div class="bg-white rounded-3xl p-5 md:p-7 shadow-xl border border-slate-100 flex flex-col md:flex-row gap-6 items-stretch">
+        
+        <!-- Cột đồ họa 3D 4K -->
+        <div class="w-full md:w-5/12 bg-slate-900 rounded-2xl p-3 flex flex-col items-center justify-between min-h-[300px] md:min-h-[370px] relative overflow-hidden border border-slate-700 shadow-xl">
+          <div class="w-full flex justify-between items-center px-1 mb-1 z-10">
+            <span class="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 text-slate-950 text-[11px] font-black uppercase tracking-wider shadow">
+              🎨 3D Vector 4K
+            </span>
+            <span id="sound-play-badge" class="cursor-pointer text-[11px] text-pink-300 font-bold bg-slate-800 px-2 py-0.5 rounded-md border border-pink-500/30 flex items-center gap-1 hover:bg-slate-700 transition">
+              <span>🔊 Nghe thử âm</span>
+            </span>
+          </div>
+
+          <div id="illustration-container" class="w-full flex-grow flex items-center justify-center relative rounded-xl overflow-hidden">
+            <!-- Đồ họa vector 3D SVG kết xuất tại đây -->
+          </div>
+
+          <div id="illustration-caption" class="w-full text-center text-xs font-bold text-indigo-200 mt-2 bg-slate-800/90 py-1.5 px-2.5 rounded-lg border border-slate-700">
+            Mô phỏng 3D trực quan
+          </div>
+        </div>
+
+        <!-- Cột tương tác (Trắc nghiệm hoặc Kéo thả) -->
+        <div class="w-full md:w-7/12 flex flex-col justify-between">
+          <div>
+            <h3 id="question-text" class="text-lg md:text-xl font-black text-slate-800 leading-snug mb-4">
+              Đang tải nội dung câu hỏi...
+            </h3>
+
+            <!-- 1. VÙNG TRẮC NGHIỆM -->
+            <div id="mcq-options" class="flex flex-col gap-2.5"></div>
+
+            <!-- 2. VÙNG KÉO THẢ HÌNH VÀ THẺ (DRAG & DROP) -->
+            <div id="drag-drop-container" class="hidden flex-col gap-4">
+              <p class="text-xs font-bold text-indigo-600 uppercase tracking-wide">
+                🎯 Hướng dẫn: Kéo thẻ hình hoặc chạm vào thẻ rồi chọn ô để thả vào đúng nhóm:
+              </p>
+
+              <!-- Các mục tiêu thả (Drop Zones) -->
+              <div id="drop-zones-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <!-- Vùng mục tiêu động -->
+              </div>
+
+              <!-- Ngân hàng thẻ nguồn kéo đi (Draggable Items) -->
+              <div class="mt-2">
+                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Thẻ hình cần phân loại:</div>
+                <div id="drag-items-pool" class="flex flex-wrap gap-2.5 min-h-[50px] p-2 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl items-center">
+                  <!-- Các thẻ ảnh 3D kéo thả -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hộp phản hồi & Lời giải khoa học -->
+          <div id="feedback-box" class="hidden mt-4 p-4 rounded-2xl border transition-all">
+            <div class="flex items-start gap-2.5">
+              <span id="feedback-icon" class="text-2xl leading-none">✅</span>
+              <div>
+                <p id="feedback-title" class="font-extrabold text-sm md:text-base mb-0.5">Chính xác!</p>
+                <p id="feedback-explanation" class="text-xs md:text-sm leading-relaxed"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút điều hướng -->
+          <div class="mt-5 flex justify-end">
+            <button id="btn-next" class="hidden px-7 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold rounded-xl shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
+              Câu tiếp theo ➔
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- MÀN HÌNH TỔNG KẾT KẾT QUẢ -->
+    <div id="screen-result" class="hidden bg-white rounded-3xl p-6 md:p-10 shadow-2xl border border-indigo-100 text-center flex flex-col items-center">
+      <div id="result-badge-icon" class="w-24 h-24 rounded-full bg-indigo-100 flex items-center justify-center text-5xl mb-4 shadow-inner">
+        🏆
+      </div>
+      <h2 id="result-title" class="text-2xl md:text-3xl font-black text-slate-800 mb-2">Chúc Mừng Em!</h2>
+      <p id="result-subtitle" class="text-slate-600 mb-6 text-sm md:text-base">Em đã xuất sắc hoàn thành xuất sắc các thử thách về Âm Thanh!</p>
+
+      <div class="grid grid-cols-3 gap-3 w-full max-w-md bg-slate-50 p-4 rounded-2xl border border-slate-200 mb-6">
+        <div class="text-center">
+          <div class="text-xs text-slate-500 font-bold uppercase">Tổng câu</div>
+          <div class="text-xl md:text-2xl font-black text-slate-700">10</div>
+        </div>
+        <div class="text-center border-x border-slate-200">
+          <div class="text-xs text-emerald-600 font-bold uppercase">Đúng</div>
+          <div id="res-correct" class="text-xl md:text-2xl font-black text-emerald-600">0</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs text-indigo-600 font-bold uppercase">Điểm số</div>
+          <div id="res-score" class="text-xl md:text-2xl font-black text-indigo-600">0</div>
+        </div>
+      </div>
+
+      <button id="btn-restart" class="w-full max-w-sm py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-extrabold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>Chơi lại từ đầu</span>
+      </button>
+    </div>
+
+  </main>
+
+  <footer class="w-full text-center py-4 text-xs font-bold text-slate-400">
+    Khoa Học Lớp 4 • Bộ Trò Chơi Tương Tác Âm Thanh Chuẩn 3D 4K
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       1. BỘ TỔNG HỢP ÂM THANH SINH ĐỘNG (WEB AUDIO API)
+       Mô phỏng tiếng trống đập, dây đàn guitar rung, sóng âm dưới nước
+       ========================================================================== */
+    class SoundFX {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+      playDrum() {
+        if (!this.enabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(45, now + 0.18);
+        gain.gain.setValueAtTime(0.7, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.26);
+      }
+      playGuitar() {
+        if (!this.enabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [329.63, 440, 587.33].forEach((f, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(f, now + i * 0.05);
+          gain.gain.setValueAtTime(0.3, now + i * 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.6);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.05);
+          osc.stop(now + i * 0.05 + 0.65);
+        });
+      }
+      playCorrect() {
+        if (!this.enabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.07);
+          gain.gain.setValueAtTime(0.2, now + i * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.28);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.07);
+          osc.stop(now + i * 0.07 + 0.3);
+        });
+      }
+      playWrong() {
+        if (!this.enabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.linearRampToValueAtTime(100, now + 0.25);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.3);
+      }
+      playPop() {
+        if (!this.enabled) return;
+        this.init();
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(750, now);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.06);
+      }
+      playVictory() {
+        if (!this.enabled) return;
+        this.init();
+        const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+        const now = this.ctx.currentTime;
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.1);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.4);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.1);
+          osc.stop(now + idx * 0.1 + 0.45);
+        });
+      }
+    }
+    const sound = new SoundFX();
+
+    /* ==========================================================================
+       2. KHO TRANH MINH HỌA 3D ISOMETRIC 4K VECTOR (ĐỘC LẬP & TỰ KẾT XUẤT)
+       ========================================================================== */
+    const ART_3D_COLLECTION = {
+      // 1. Mặt trống rung động làm nảy các hạt đậu
+      drumVibrate: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <defs>
+              <linearGradient id="drumSide" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#991b1b"/><stop offset="50%" stop-color="#ef4444"/><stop offset="100%" stop-color="#7f1d1d"/>
+              </linearGradient>
+              <radialGradient id="drumTop" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#fef3c7"/><stop offset="80%" stop-color="#fde68a"/><stop offset="100%" stop-color="#d97706"/>
+              </radialGradient>
+            </defs>
+            <rect width="400" height="300" fill="#0f172a"/>
+            <!-- Sóng âm lan tỏa 3D xung quanh trống -->
+            <ellipse cx="200" cy="140" rx="140" ry="60" fill="none" stroke="#6366f1" stroke-width="3" stroke-dasharray="10 8" class="anim-pulse-wave"/>
+            <ellipse cx="200" cy="140" rx="170" ry="75" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="6 6" opacity="0.6"/>
+            <!-- Thân trống 3D -->
+            <path d="M100,140 L100,210 Q200,260 300,210 L300,140 Z" fill="url(#drumSide)"/>
+            <path d="M100,210 Q200,260 300,210 Q200,240 100,210" fill="#450a0a"/>
+            <!-- Mặt trống elip 3D -->
+            <ellipse cx="200" cy="140" rx="100" ry="42" fill="url(#drumTop)" stroke="#b45309" stroke-width="4"/>
+            <!-- Vạch sóng rung động trên mặt trống -->
+            <path d="M160,140 Q200,130 240,140" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M175,147 Q200,140 225,147" stroke="#f59e0b" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <!-- Hạt xốp / hạt đậu nhảy tưng bừng do mặt trống RUNG ĐỘNG -->
+            <circle cx="170" cy="115" r="7" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <circle cx="200" cy="95" r="8" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <circle cx="230" cy="110" r="7" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <circle cx="215" cy="122" r="6" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+            <!-- Dùi trống đập xuống 3D -->
+            <g transform="translate(190, 60) rotate(35)">
+              <rect x="0" y="0" width="12" height="90" rx="6" fill="#f1f5f9"/>
+              <ellipse cx="6" cy="90" rx="12" ry="12" fill="#e2e8f0"/>
+            </g>
+          </svg>
+        </div>
+      `,
+
+      // 2. Dây đàn guitar rung khi gảy
+      guitarString: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <defs>
+              <linearGradient id="woodGuitar" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#b45309"/><stop offset="50%" stop-color="#d97706"/><stop offset="100%" stop-color="#78350f"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="#0f172a"/>
+            <!-- Thùng đàn guitar 3D -->
+            <path d="M120,60 Q170,110 130,160 Q70,220 200,270 Q330,220 270,160 Q230,110 280,60 Z" fill="url(#woodGuitar)" stroke="#451a03" stroke-width="5"/>
+            <!-- Lỗ thoát âm tròn đen -->
+            <circle cx="200" cy="170" r="45" fill="#18181b" stroke="#fcd34d" stroke-width="4"/>
+            <!-- Dây đàn guitar đang rung hình dải sóng nhòe -->
+            <ellipse cx="200" cy="170" rx="8" ry="120" fill="#fef08a" opacity="0.35"/>
+            <line x1="185" y1="50" x2="185" y2="280" stroke="#e2e8f0" stroke-width="2.5"/>
+            <!-- Dây số 2 đang RUNG GẢY LẮC LƯ -->
+            <path d="M195,50 Q208,170 195,280" stroke="#fde047" stroke-width="3.5" fill="none"/>
+            <path d="M195,50 Q182,170 195,280" stroke="#fde047" stroke-width="2" stroke-dasharray="4 4" fill="none" opacity="0.8"/>
+            <line x1="205" y1="50" x2="205" y2="280" stroke="#e2e8f0" stroke-width="2.5"/>
+            <line x1="215" y1="50" x2="215" y2="280" stroke="#e2e8f0" stroke-width="2.5"/>
+            <!-- Nốt nhạc 3D bay lên 🎵 -->
+            <g transform="translate(250, 90) scale(1.2)">
+              <path d="M10,25 A5,5 0 1,1 5,20 L5,5 L25,0 L25,15 A5,5 0 1,1 20,10 L20,3 L7,6 L7,22" fill="#38bdf8"/>
+            </g>
+          </svg>
+        </div>
+      `,
+
+      // 3. Âm thanh truyền trong chất lỏng (Người bơi / Cá voi dưới nước)
+      soundUnderLiquid: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <defs>
+              <linearGradient id="waterDepth" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#0284c7"/><stop offset="50%" stop-color="#0369a1"/><stop offset="100%" stop-color="#0c4a6e"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="url(#waterDepth)"/>
+            <!-- Mặt nước phía trên -->
+            <path d="M0,40 Q100,25 200,40 T400,40 L400,0 L0,0 Z" fill="#38bdf8" opacity="0.5"/>
+            <!-- Bọt khí li ti -->
+            <circle cx="80" cy="180" r="5" fill="#e0f2fe" opacity="0.6"/>
+            <circle cx="120" cy="220" r="8" fill="#e0f2fe" opacity="0.5"/>
+            <circle cx="280" cy="190" r="6" fill="#e0f2fe" opacity="0.7"/>
+            <!-- Nguồn phát sóng âm dưới nước (Hai viên sỏi gõ vào nhau) -->
+            <g transform="translate(100, 160)">
+              <!-- Sóng âm lan truyền trong chất lỏng -->
+              <circle cx="0" cy="0" r="30" fill="none" stroke="#e0e7ff" stroke-width="3" stroke-dasharray="6 6" class="anim-pulse-wave"/>
+              <circle cx="0" cy="0" r="60" fill="none" stroke="#bae6fd" stroke-width="2" stroke-dasharray="8 8"/>
+              <circle cx="0" cy="0" r="100" fill="none" stroke="#7dd3fc" stroke-width="1.5" stroke-dasharray="10 10"/>
+              <!-- Hai viên đá gõ vào nhau -->
+              <ellipse cx="-8" cy="0" rx="14" ry="18" fill="#64748b"/>
+              <ellipse cx="8" cy="0" rx="14" ry="18" fill="#94a3b8"/>
+              <path d="M-15,-20 L15,20" stroke="#fef08a" stroke-width="3"/>
+            </g>
+            <!-- Người lặn dưới nước vẫn nghe rõ tiếng gõ -->
+            <g transform="translate(260, 130)">
+              <!-- Đầu thợ lặn -->
+              <circle cx="40" cy="30" r="26" fill="#fed7aa"/>
+              <!-- Kính lặn -->
+              <rect x="25" y="20" width="35" height="18" rx="8" fill="#0284c7" stroke="#0f172a" stroke-width="3"/>
+              <!-- Tai đón nhận sóng âm -->
+              <ellipse cx="20" cy="32" rx="6" ry="8" fill="#fbcfe8"/>
+              <path d="M12,24 Q5,32 12,40" stroke="#f43f5e" stroke-width="3" fill="none"/>
+            </g>
+          </svg>
+        </div>
+      `,
+
+      // 4. Âm thanh truyền qua chất rắn (Áp tai vào mặt bàn gõ)
+      solidSoundTable: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <defs>
+              <linearGradient id="solidWood" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#9a3412"/><stop offset="50%" stop-color="#c2410c"/><stop offset="100%" stop-color="#7c2d12"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="#0f172a"/>
+            <!-- Mặt bàn gỗ chất rắn 3D dày -->
+            <polygon points="30,170 370,170 390,260 10,260" fill="url(#solidWood)"/>
+            <polygon points="10,260 390,260 390,280 10,280" fill="#431407"/>
+            <!-- Bạn gõ tay xuống mặt bàn (Nguồn âm) -->
+            <g transform="translate(80, 140)">
+              <!-- Nắm tay gõ -->
+              <circle cx="20" cy="20" r="18" fill="#fed7aa"/>
+              <rect x="5" y="20" width="30" height="20" rx="8" fill="#fed7aa"/>
+              <!-- Tia rung chấn lan xuyên qua thớ gỗ chất rắn -->
+              <path d="M20,38 L20,55" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+              <path d="M20,45 L320,45" stroke="#facc15" stroke-width="4" stroke-dasharray="10 6" class="anim-pulse-wave"/>
+            </g>
+            <!-- Bạn áp tai sát mặt bàn chất rắn nghe cực to và rõ -->
+            <g transform="translate(260, 100)">
+              <!-- Khuôn mặt áp má xuống bàn -->
+              <ellipse cx="50" cy="65" rx="36" ry="30" fill="#fed7aa"/>
+              <!-- Vành tai áp sát trực tiếp vào mặt gỗ -->
+              <ellipse cx="55" cy="72" rx="12" ry="8" fill="#f43f5e"/>
+              <!-- Mái tóc -->
+              <path d="M15,60 Q50,20 85,55 Z" fill="#1e293b"/>
+              <text x="50" y="20" fill="#a7f3d0" font-size="13" font-weight="900" text-anchor="middle">NGHE CỰC RÕ!</text>
+            </g>
+          </svg>
+        </div>
+      `,
+
+      // 5. Độ to âm thanh theo khoảng cách: Ở gần nghe to, ở xa nghe nhỏ
+      distanceLoudness: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <defs>
+              <linearGradient id="soundCone" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#ec4899" stop-opacity="0.9"/>
+                <stop offset="40%" stop-color="#8b5cf6" stop-opacity="0.5"/>
+                <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+            <rect width="400" height="300" fill="#090d16"/>
+            <!-- Loa công suất lớn 3D bên trái -->
+            <g transform="translate(40, 120)">
+              <polygon points="0,20 25,20 50,0 50,60 25,40 0,40" fill="#f43f5e"/>
+              <!-- Vòm sóng âm hình nón mở rộng -->
+              <polygon points="50,30 360,-20 360,80" fill="url(#soundCone)"/>
+              <circle cx="25" cy="30" r="10" fill="#fef08a"/>
+            </g>
+            <!-- Vị trí A: Ở GẦN (Nghe TO) -->
+            <g transform="translate(140, 170)">
+              <circle cx="15" cy="15" r="14" fill="#38bdf8"/>
+              <rect x="8" y="29" width="14" height="24" rx="4" fill="#0284c7"/>
+              <!-- Ký hiệu âm lượng LỚN 🔊 -->
+              <rect x="-10" y="58" width="50" height="22" rx="6" fill="#10b981"/>
+              <text x="15" y="73" fill="#ffffff" font-size="11" font-weight="900" text-anchor="middle">Ở GẦN: TO</text>
+            </g>
+            <!-- Vị trí B: Ở XA (Nghe NHỎ) -->
+            <g transform="translate(320, 170)">
+              <circle cx="15" cy="15" r="14" fill="#94a3b8"/>
+              <rect x="8" y="29" width="14" height="24" rx="4" fill="#64748b"/>
+              <!-- Ký hiệu âm lượng NHỎ 🔉 -->
+              <rect x="-10" y="58" width="50" height="22" rx="6" fill="#f59e0b"/>
+              <text x="15" y="73" fill="#ffffff" font-size="11" font-weight="900" text-anchor="middle">Ở XA: NHỎ</text>
+            </g>
+          </svg>
+        </div>
+      `,
+
+      // 6. Thanh âm thoa rung chạm mặt nước bắn tung tóe
+      tuningFork: `
+        <div class="art-3d-box">
+          <svg viewBox="0 0 400 300">
+            <rect width="400" height="300" fill="#0f172a"/>
+            <!-- Cốc nước 3D trong suốt -->
+            <path d="M140,160 L150,260 Q200,275 250,260 L260,160 Z" fill="#38bdf8" opacity="0.4" stroke="#e0f2fe" stroke-width="3"/>
+            <ellipse cx="200" cy="160" rx="60" ry="15" fill="#0284c7" stroke="#e0f2fe" stroke-width="2"/>
+            <!-- Thanh âm thoa kim loại 3D hình chữ U -->
+            <g transform="translate(180, 50)">
+              <rect x="0" y="100" width="16" height="40" rx="4" fill="#94a3b8"/>
+              <path d="M-15,10 L-15,80 Q8,100 31,80 L31,10" stroke="#cbd5e1" stroke-width="12" fill="none" stroke-linecap="round"/>
+              <!-- Rung động thanh âm thoa -->
+              <path d="M-22,10 L-22,75" stroke="#fde047" stroke-width="2" stroke-dasharray="3 3"/>
+              <path d="M38,10 L38,75" stroke="#fde047" stroke-width="2" stroke-dasharray="3 3"/>
+            </g>
+            <!-- Giọt nước bắn tung tóe khi chạm vào đầu thanh âm thoa đang RUNG ĐỘNG -->
+            <circle cx="170" cy="150" r="5" fill="#bae6fd"/>
+            <circle cx="230" cy="148" r="6" fill="#bae6fd"/>
+            <circle cx="200" cy="140" r="7" fill="#ffffff"/>
+            <circle cx="215" cy="130" r="4" fill="#bae6fd"/>
+            <!-- Vòng sóng nước đồng tâm loang ra -->
+            <ellipse cx="200" cy="160" rx="35" ry="8" fill="none" stroke="#ffffff" stroke-width="2" class="anim-pulse-wave"/>
+          </svg>
+        </div>
+      `
+    };
+
+    /* Thẻ icon 3D nhỏ dùng trong phần kéo thả */
+    const THUMB_3D = {
+      bell: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#f59e0b"/><path d="M25,10 C18,10 16,18 16,28 L12,32 L38,32 L34,28 C34,18 32,10 25,10 Z" fill="#fef08a"/><circle cx="25" cy="35" r="4" fill="#78350f"/></svg>`,
+      water: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#0284c7"/><path d="M25,12 C25,12 16,24 16,30 A9,9 0 0,0 34,30 C34,24 25,12 25,12 Z" fill="#e0f2fe"/></svg>`,
+      table: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#b45309"/><rect x="12" y="20" width="26" height="6" rx="2" fill="#fde68a"/><line x1="16" y1="26" x2="16" y2="36" stroke="#fde68a" stroke-width="3"/><line x1="34" y1="26" x2="34" y2="36" stroke="#fde68a" stroke-width="3"/></svg>`,
+      air: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#818cf8"/><path d="M14,20 Q24,15 34,20 M16,26 Q26,30 36,25" stroke="#ffffff" stroke-width="3" stroke-linecap="round" fill="none"/></svg>`,
+      drum: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#ef4444"/><ellipse cx="25" cy="20" rx="14" ry="6" fill="#fef08a"/><path d="M11,20 L11,30 Q25,37 39,30 L39,20 Z" fill="#991b1b"/></svg>`,
+      guitar: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#d97706"/><circle cx="25" cy="30" r="10" fill="#78350f"/><line x1="25" y1="12" x2="25" y2="30" stroke="#fef08a" stroke-width="2.5"/></svg>`,
+      speakerClose: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#10b981"/><path d="M18,18 L24,18 L30,12 L30,38 L24,32 L18,32 Z" fill="#ffffff"/><path d="M34,20 Q38,25 34,30" stroke="#ffffff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>`,
+      speakerFar: `<svg viewBox="0 0 50 50" class="w-10 h-10"><circle cx="25" cy="25" r="22" fill="#64748b"/><path d="M20,20 L24,20 L28,16 L28,34 L24,30 L20,30 Z" fill="#cbd5e1"/></svg>`
+    };
+
+    /* ==========================================================================
+       3. DỮ LIỆU CÂU HỎI: 6 CÂU TRẮC NGHIỆM & 4 CÂU KÉO THẢ HÌNH
+       ========================================================================== */
+    const QUESTIONS_DATA = [
+      /* --- 6 CÂU TRẮC NGHIỆM --- */
+      {
+        id: 1,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 1/6)',
+        artKey: 'drumVibrate',
+        caption: 'Mặt trống rung động làm các hạt xốp nảy lên và phát ra tiếng trống',
+        soundType: 'drum',
+        question: 'Câu 1: Khi ta gõ trống, các hạt xốp đặt trên mặt trống nảy lên và trống phát ra âm thanh. Hiện tượng này chứng minh điều gì?',
+        options: [
+          { text: 'A. Tất cả các vật khi phát ra âm thanh đều rung động', correct: true },
+          { text: 'B. Hạt xốp tự biết nhảy múa khi nghe tiếng ồn', correct: false },
+          { text: 'C. Trống chỉ phát ra âm thanh khi hạt xốp rơi xuống đất', correct: false },
+          { text: 'D. Không khí xung quanh mặt trống bị đóng băng', correct: false }
+        ],
+        explanation: 'Mọi vật phát ra âm thanh đều rung động. Mặt trống dao động rung lên xuống làm nảy các hạt xốp và truyền sóng âm vào không khí.'
+      },
+      {
+        id: 2,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 2/6)',
+        artKey: 'guitarString',
+        caption: 'Dây đàn ghi-ta rung nhanh qua lại khi ngón tay gảy đàn',
+        soundType: 'guitar',
+        question: 'Câu 2: Bộ phận nào của cây đàn ghi-ta rung động để phát ra âm thanh khi nghệ sĩ gảy đàn?',
+        options: [
+          { text: 'A. Các sợi dây đàn bị gảy rung động qua lại rất nhanh', correct: true },
+          { text: 'B. Chiếc khóa vặn trên cần đàn tự xoay tròn', correct: false },
+          { text: 'C. Dây đeo vai của nghệ sĩ rung lên', correct: false },
+          { text: 'D. Ngón tay của người chơi đàn rung động', correct: false }
+        ],
+        explanation: 'Khi dùng tay gảy, dây đàn ghi-ta sẽ dao động rung qua lại cực nhanh, làm rung khối không khí trong thùng đàn và tạo nên giai điệu.'
+      },
+      {
+        id: 3,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 3/6)',
+        artKey: 'soundUnderLiquid',
+        caption: 'Hai viên sỏi gõ vào nhau dưới nước, người lặn vẫn nghe rất rõ',
+        soundType: 'drum',
+        question: 'Câu 3: Hai thợ lặn ở dưới nước gõ hai hòn sỏi vào nhau và vẫn nghe thấy âm thanh. Thí nghiệm này chứng tỏ điều gì?',
+        options: [
+          { text: 'A. Âm thanh có thể lan truyền qua môi trường chất lỏng (nước)', correct: true },
+          { text: 'B. Âm thanh chỉ truyền được trên cạn', correct: false },
+          { text: 'C. Nước hoàn toàn ngăn chặn mọi âm thanh', correct: false },
+          { text: 'D. Dưới nước không thể có bất kỳ âm thanh nào', correct: false }
+        ],
+        explanation: 'Âm thanh có thể truyền qua cả 3 môi trường: chất khí, chất lỏng và chất rắn. Nước truyền âm thanh rất tốt.'
+      },
+      {
+        id: 4,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 4/6)',
+        artKey: 'solidSoundTable',
+        caption: 'Áp tai xuống mặt bàn gỗ nghe tiếng gõ to và rõ hơn nhiều khi để tai trong không khí',
+        soundType: 'pop',
+        question: 'Câu 4: Khi áp một bên tai sát vào mặt bàn gỗ và gõ nhẹ ở đầu bàn bên kia, ta nghe thấy tiếng gõ rất to và rõ vì lý do gì?',
+        options: [
+          { text: 'A. Gỗ là chất rắn truyền âm thanh cực kỳ tốt và nhanh', correct: true },
+          { text: 'B. Vì mặt bàn đã tự tạo thêm âm thanh mới', correct: false },
+          { text: 'C. Vì tai của chúng ta bị bịt kín', correct: false },
+          { text: 'D. Vì không khí trong phòng biến mất', correct: false }
+        ],
+        explanation: 'Âm thanh truyền qua chất rắn (như gỗ, kim loại, đất đá) tốt hơn và rõ hơn nhiều so với khi truyền qua chất khí (không khí).'
+      },
+      {
+        id: 5,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 5/6)',
+        artKey: 'distanceLoudness',
+        caption: 'Ở gần nguồn âm nghe to rõ, càng lùi ra xa thì âm thanh càng nhỏ dần',
+        soundType: 'pop',
+        question: 'Câu 5: Khi một chiếc xe cứu thương bật còi hú chạy từ xa tiến lại gần em, rồi lại chạy ra xa dần, em sẽ nghe thấy âm thanh còi hú biến đổi thế nào?',
+        options: [
+          { text: 'A. Tiếng còi to dần lên khi xe lại gần, rồi nhỏ dần đi khi xe chạy ra xa', correct: true },
+          { text: 'B. Tiếng còi luôn giữ nguyên âm lượng không đổi', correct: false },
+          { text: 'C. Càng lại gần thì tiếng còi càng biến mất', correct: false },
+          { text: 'D. Càng ra xa thì tiếng còi càng to chói tai hơn', correct: false }
+        ],
+        explanation: 'Ghi nhớ cốt lõi: Khi ở gần nguồn âm sẽ nghe thấy âm thanh to hơn khi ở xa nguồn âm. Càng ra xa, năng lượng sóng âm càng phân tán nên nghe nhỏ dần.'
+      },
+      {
+        id: 6,
+        type: 'mcq',
+        section: 'Phần 1: Trắc nghiệm (Câu 6/6)',
+        artKey: 'tuningFork',
+        caption: 'Thanh âm thoa rung khi gõ và làm mặt nước trong cốc bắn tung tóe',
+        soundType: 'pop',
+        question: 'Câu 6: Nếu ta dùng tay giữ chặt lấy một chiếc chuông đồng đang reo (ngăn không cho chuông rung nữa), thì điều gì sẽ xảy ra?',
+        options: [
+          { text: 'A. Tiếng chuông sẽ lập tức ngừng kêu (tắt âm)', correct: true },
+          { text: 'B. Chuông sẽ kêu to gấp hai lần bình thường', correct: false },
+          { text: 'C. Chuông đổi màu sắc ngay lập tức', correct: false },
+          { text: 'D. Tiếng chuông vẫn tiếp tục vang mãi mãi', correct: false }
+        ],
+        explanation: 'Âm thanh được tạo ra bởi sự rung động. Khi bàn tay giữ chặt chuông khiến vật ngừng rung động, âm thanh cũng lập tức chấm dứt.'
+      },
+
+      /* --- 4 CÂU KÉO THẢ HÌNH VÀ THẺ MINH HỌA 3D --- */
+      {
+        id: 7,
+        type: 'dragdrop',
+        section: 'Phần 2: Kéo - Thả hình (Câu 1/4)',
+        artKey: 'soundUnderLiquid',
+        caption: 'Phân loại các môi trường truyền âm thanh trong tự nhiên',
+        soundType: 'pop',
+        question: 'Câu 7: Em hãy kéo thả từng hiện tượng vào đúng môi trường truyền âm (Chất Rắn, Chất Lỏng hoặc Chất Khí):',
+        zones: [
+          { id: 'zone_solid', title: 'Chất Rắn', color: 'border-amber-400 bg-amber-50/60', targetType: 'solid' },
+          { id: 'zone_liquid', title: 'Chất Lỏng', color: 'border-sky-400 bg-sky-50/60', targetType: 'liquid' },
+          { id: 'zone_gas', title: 'Chất Khí', color: 'border-indigo-400 bg-indigo-50/60', targetType: 'gas' }
+        ],
+        items: [
+          { id: 'item_1', name: 'Áp tai mặt bàn gỗ', type: 'solid', thumb: 'table' },
+          { id: 'item_2', name: 'Cá voi bơi dưới biển', type: 'liquid', thumb: 'water' },
+          { id: 'item_3', name: 'Nói chuyện trong lớp', type: 'gas', thumb: 'air' }
+        ],
+        explanation: 'Âm thanh có thể lan truyền qua cả 3 môi trường: chất rắn (bàn gỗ), chất lỏng (nước biển) và chất khí (không khí trong phòng).'
+      },
+      {
+        id: 8,
+        type: 'dragdrop',
+        section: 'Phần 2: Kéo - Thả hình (Câu 2/4)',
+        artKey: 'drumVibrate',
+        caption: 'Ghép nối các vật dụng với bộ phận phát ra âm thanh nhờ sự Rung Động',
+        soundType: 'drum',
+        question: 'Câu 8: Kéo thả các nguồn âm sau vào nhóm "Vật phát ra âm thanh ĐANG RUNG ĐỘNG" hay "Vật KHÔNG RUNG ĐỘNG":',
+        zones: [
+          { id: 'zone_vibrate', title: 'Đang Rung Động (Phát Ra Âm)', color: 'border-emerald-400 bg-emerald-50/60', targetType: 'vibrating' },
+          { id: 'zone_quiet', title: 'Không Rung Động (Yên Lặng)', color: 'border-slate-300 bg-slate-50/60', targetType: 'silent' }
+        ],
+        items: [
+          { id: 'item_drum_vib', name: 'Mặt trống đang nảy hạt', type: 'vibrating', thumb: 'drum' },
+          { id: 'item_guitar_vib', name: 'Dây đàn gảy rung lắc', type: 'vibrating', thumb: 'guitar' },
+          { id: 'item_bell_silent', name: 'Chuông đặt yên trên bàn', type: 'silent', thumb: 'bell' }
+        ],
+        explanation: 'Chỉ những vật thể đang rung động (như mặt trống nảy, dây đàn dao động) mới phát ra âm thanh. Vật nằm yên tĩnh sẽ không phát ra tiếng.'
+      },
+      {
+        id: 9,
+        type: 'dragdrop',
+        section: 'Phần 2: Kéo - Thả hình (Câu 3/4)',
+        artKey: 'distanceLoudness',
+        caption: 'Độ to của âm thanh thay đổi như thế nào tùy thuộc vào khoảng cách?',
+        soundType: 'pop',
+        question: 'Câu 9: Kéo thả vị trí của người nghe vào hộp mức âm thanh tương ứng (Nghe To Rõ hay Nghe Nhỏ Hơn):',
+        zones: [
+          { id: 'zone_loud', title: 'Âm thanh To Rõ Ràng', color: 'border-emerald-400 bg-emerald-50/60', targetType: 'loud' },
+          { id: 'zone_soft', title: 'Âm thanh Nhỏ Dần Đi', color: 'border-amber-400 bg-amber-50/60', targetType: 'soft' }
+        ],
+        items: [
+          { id: 'item_close', name: 'Đứng sát cạnh loa phát', type: 'loud', thumb: 'speakerClose' },
+          { id: 'item_far', name: 'Đứng cách xa nguồn âm 100m', type: 'soft', thumb: 'speakerFar' }
+        ],
+        explanation: 'Khi ở gần nguồn âm ta sẽ nghe thấy âm thanh to hơn; khi ở càng xa nguồn âm thì âm thanh nghe thấy càng nhỏ hơn.'
+      },
+      {
+        id: 10,
+        type: 'dragdrop',
+        section: 'Phần 2: Kéo - Thả hình (Câu 4/4)',
+        artKey: 'solidSoundTable',
+        caption: 'So sánh khả năng truyền âm của chất rắn và chất khí qua thí nghiệm gõ bàn',
+        soundType: 'drum',
+        question: 'Câu 10: Hãy kéo thả 2 cách nghe tiếng gõ bàn vào nhóm đánh giá độ to của âm thanh:',
+        zones: [
+          { id: 'zone_loud_table', title: 'Nghe To & Rõ Hơn', color: 'border-indigo-400 bg-indigo-50/60', targetType: 'better' },
+          { id: 'zone_soft_table', title: 'Nghe Nhỏ Hơn', color: 'border-slate-300 bg-slate-50/60', targetType: 'weaker' }
+        ],
+        items: [
+          { id: 'item_solid_ear', name: 'Áp sát tai vào mặt bàn', type: 'better', thumb: 'table' },
+          { id: 'item_air_ear', name: 'Đứng thẳng nghe qua không khí', type: 'weaker', thumb: 'air' }
+        ],
+        explanation: 'Mặt bàn là chất rắn nên truyền âm thanh rất tốt, giúp tai nghe tiếng gõ to rõ hơn nhiều so với khi nghe qua không khí.'
+      }
+    ];
+
+    /* ==========================================================================
+       4. BỘ ĐIỀU KHIỂN LOGIC TRÒ CHƠI
+       ========================================================================== */
+    let currentIndex = 0;
+    let score = 0;
+    let correctCount = 0;
+    let selectedDragItem = null; // Dành cho cảm ứng chạm trên điện thoại
+    let zoneAssignments = {};
+
+    // DOM Elements
+    const screenStart = document.getElementById('screen-start');
+    const screenGame = document.getElementById('screen-game');
+    const screenResult = document.getElementById('screen-result');
+
+    const scoreDisplay = document.getElementById('score-display');
+    const badgeSection = document.getElementById('badge-section');
+    const currentQuestionNum = document.getElementById('current-question-num');
+    const progressBar = document.getElementById('progress-bar');
+
+    const illustrationContainer = document.getElementById('illustration-container');
+    const illustrationCaption = document.getElementById('illustration-caption');
+    const questionText = document.getElementById('question-text');
+
+    const mcqOptions = document.getElementById('mcq-options');
+    const dragDropContainer = document.getElementById('drag-drop-container');
+    const dropZonesGrid = document.getElementById('drop-zones-grid');
+    const dragItemsPool = document.getElementById('drag-items-pool');
+
+    const feedbackBox = document.getElementById('feedback-box');
+    const feedbackIcon = document.getElementById('feedback-icon');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackExplanation = document.getElementById('feedback-explanation');
+    const btnNext = document.getElementById('btn-next');
+
+    const soundBtn = document.getElementById('toggle-sound-btn');
+    const soundIcon = document.getElementById('sound-icon');
+    const soundPlayBadge = document.getElementById('sound-play-badge');
+
+    // Bật/Tắt âm
+    soundBtn.addEventListener('click', () => {
+      sound.enabled = !sound.enabled;
+      soundIcon.textContent = sound.enabled ? '🔊' : '🔇';
+    });
+
+    // Nút nghe thử âm thanh minh họa
+    soundPlayBadge.addEventListener('click', () => {
+      const q = QUESTIONS_DATA[currentIndex];
+      if (q.soundType === 'drum') sound.playDrum();
+      else if (q.soundType === 'guitar') sound.playGuitar();
+      else sound.playPop();
+    });
+
+    // Bắt đầu chơi
+    document.getElementById('btn-start').addEventListener('click', () => {
+      sound.playPop();
+      startGame();
+    });
+
+    // Chơi lại
+    document.getElementById('btn-restart').addEventListener('click', () => {
+      sound.playPop();
+      startGame();
+    });
+
+    function startGame() {
+      currentIndex = 0;
+      score = 0;
+      correctCount = 0;
+      updateScoreUI();
+      screenStart.classList.add('hidden');
+      screenResult.classList.add('hidden');
+      screenGame.classList.remove('hidden');
+      screenGame.classList.add('flex');
+      loadQuestion(currentIndex);
+    }
+
+    function updateScoreUI() {
+      scoreDisplay.textContent = score;
+    }
+
+    function loadQuestion(index) {
+      const q = QUESTIONS_DATA[index];
+      zoneAssignments = {};
+      selectedDragItem = null;
+
+      badgeSection.textContent = q.section;
+      currentQuestionNum.textContent = index + 1;
+      const progressPercent = ((index + 1) / QUESTIONS_DATA.length) * 100;
+      progressBar.style.width = `${progressPercent}%`;
+
+      // Cập nhật tranh 3D 4K
+      illustrationContainer.innerHTML = ART_3D_COLLECTION[q.artKey] || '';
+      illustrationCaption.textContent = q.caption;
+      questionText.textContent = q.question;
+
+      feedbackBox.classList.add('hidden');
+      btnNext.classList.add('hidden');
+
+      if (q.type === 'mcq') {
+        renderMCQ(q);
+      } else if (q.type === 'dragdrop') {
+        renderDragDrop(q);
+      }
+    }
+
+    /* RENDER TRẮC NGHIỆM */
+    function renderMCQ(q) {
+      mcqOptions.classList.remove('hidden');
+      dragDropContainer.classList.add('hidden');
+      mcqOptions.innerHTML = '';
+
+      q.options.forEach((opt) => {
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left p-4 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-400 font-bold text-slate-700 transition flex items-center justify-between group shadow-sm`;
+        btn.innerHTML = `
+          <span class="pr-2 leading-relaxed text-sm md:text-base">${opt.text}</span>
+          <span class="w-6 h-6 rounded-full border-2 border-slate-300 flex-shrink-0 flex items-center justify-center text-xs text-transparent group-hover:border-indigo-500">●</span>
+        `;
+        btn.onclick = () => handleMCQAnswer(opt, btn, q);
+        mcqOptions.appendChild(btn);
+      });
+    }
+
+    function handleMCQAnswer(selectedOption, buttonElement, q) {
+      const allButtons = mcqOptions.querySelectorAll('button');
+      allButtons.forEach(b => b.disabled = true);
+
+      if (selectedOption.correct) {
+        sound.playCorrect();
+        score += 10;
+        correctCount++;
+        updateScoreUI();
+        buttonElement.className = "w-full text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-950 transition flex items-center justify-between shadow-md";
+        buttonElement.querySelector('span:last-child').className = "w-6 h-6 rounded-full bg-emerald-500 text-white flex-shrink-0 flex items-center justify-center text-xs font-bold";
+        buttonElement.querySelector('span:last-child').textContent = "✓";
+        showFeedback(true, 'Hoàn toàn chính xác!', q.explanation);
+      } else {
+        sound.playWrong();
+        buttonElement.className = "w-full text-left p-4 rounded-2xl border-2 border-rose-500 bg-rose-50 font-bold text-rose-950 transition flex items-center justify-between shadow-md";
+        buttonElement.querySelector('span:last-child').className = "w-6 h-6 rounded-full bg-rose-500 text-white flex-shrink-0 flex items-center justify-center text-xs font-bold";
+        buttonElement.querySelector('span:last-child').textContent = "✗";
+
+        q.options.forEach((opt, i) => {
+          if (opt.correct) {
+            allButtons[i].className = "w-full text-left p-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50 font-bold text-emerald-900 transition flex items-center justify-between";
+          }
+        });
+        showFeedback(false, 'Chưa đúng rồi em nhé!', q.explanation);
+      }
+
+      btnNext.classList.remove('hidden');
+      btnNext.textContent = 'Câu tiếp theo ➔';
+      btnNext.onclick = goToNextQuestion;
+    }
+
+    /* RENDER KÉO THẢ HÌNH VÀ THẺ (HỖ TRỢ CẢ KÉO CHUỘT LẪN CHẠM TÁP MÀN HÌNH) */
+    function renderDragDrop(q) {
+      mcqOptions.classList.add('hidden');
+      dragDropContainer.classList.remove('hidden');
+      dropZonesGrid.innerHTML = '';
+      dragItemsPool.innerHTML = '';
+
+      // Thiết lập lưới vùng thả
+      dropZonesGrid.className = `grid grid-cols-1 sm:grid-cols-${q.zones.length} gap-2.5`;
+
+      q.zones.forEach(zone => {
+        const zoneEl = document.createElement('div');
+        zoneEl.id = `zone-${zone.id}`;
+        zoneEl.className = `p-3 rounded-2xl border-2 border-dashed ${zone.color} min-h-[120px] flex flex-col justify-between transition-all duration-200`;
+        zoneEl.innerHTML = `
+          <div class="font-extrabold text-xs uppercase tracking-wider text-slate-700 mb-2 border-b pb-1 flex items-center justify-between">
+            <span>${zone.title}</span>
+            <span class="text-[10px] text-slate-400 count-badge">0 mục</span>
+          </div>
+          <div class="zone-content flex flex-wrap gap-1.5 flex-grow items-start min-h-[60px]"></div>
+        `;
+
+        // Sự kiện Drag & Drop trên máy tính
+        zoneEl.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          zoneEl.classList.add('drop-zone-active');
+        });
+        zoneEl.addEventListener('dragleave', () => {
+          zoneEl.classList.remove('drop-zone-active');
+        });
+        zoneEl.addEventListener('drop', (e) => {
+          e.preventDefault();
+          zoneEl.classList.remove('drop-zone-active');
+          const itemId = e.dataTransfer.getData('text/plain');
+          placeItemIntoZone(itemId, zone, q);
+        });
+
+        // Sự kiện Click chọn vùng cho thiết bị cảm ứng điện thoại
+        zoneEl.addEventListener('click', () => {
+          if (selectedDragItem) {
+            placeItemIntoZone(selectedDragItem.id, zone, q);
+            selectedDragItem = null;
+            clearSelectedHighlight();
+          }
+        });
+
+        dropZonesGrid.appendChild(zoneEl);
+      });
+
+      // Tạo các thẻ hình 3D cần kéo thả
+      q.items.forEach(item => {
+        const itemCard = document.createElement('div');
+        itemCard.id = `card-${item.id}`;
+        itemCard.draggable = true;
+        itemCard.className = "draggable-card p-2 bg-white rounded-xl border-2 border-slate-200 shadow-sm flex items-center gap-2 hover:border-indigo-400 active:scale-95 transition cursor-pointer";
+        itemCard.innerHTML = `
+          <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center p-1 border border-indigo-100 flex-shrink-0">
+            ${THUMB_3D[item.thumb] || '🎵'}
+          </div>
+          <span class="text-xs font-extrabold text-slate-800">${item.name}</span>
+        `;
+
+        // Drag events
+        itemCard.addEventListener('dragstart', (e) => {
+          sound.playPop();
+          e.dataTransfer.setData('text/plain', item.id);
+        });
+
+        // Tap/Click event trên điện thoại
+        itemCard.addEventListener('click', (e) => {
+          e.stopPropagation();
+          sound.playPop();
+          if (selectedDragItem && selectedDragItem.id === item.id) {
+            selectedDragItem = null;
+            clearSelectedHighlight();
+          } else {
+            selectedDragItem = item;
+            clearSelectedHighlight();
+            itemCard.classList.add('ring-4', 'ring-indigo-400', 'border-indigo-600');
+          }
+        });
+
+        dragItemsPool.appendChild(itemCard);
+      });
+
+      btnNext.classList.remove('hidden');
+      btnNext.textContent = 'Kiểm tra kết quả ➔';
+      btnNext.onclick = () => verifyDragDropAnswer(q);
+    }
+
+    function clearSelectedHighlight() {
+      document.querySelectorAll('.draggable-card').forEach(el => {
+        el.classList.remove('ring-4', 'ring-indigo-400', 'border-indigo-600');
+      });
+    }
+
+    function placeItemIntoZone(itemId, zone, q) {
+      sound.playPop();
+      const cardEl = document.getElementById(`card-${itemId}`);
+      const targetZoneContent = document.querySelector(`#zone-${zone.id} .zone-content`);
+      if (cardEl && targetZoneContent) {
+        targetZoneContent.appendChild(cardEl);
+        zoneAssignments[itemId] = zone.targetType;
+        updateZoneCounters();
+      }
+    }
+
+    function updateZoneCounters() {
+      document.querySelectorAll('#drop-zones-grid > div').forEach(zoneEl => {
+        const count = zoneEl.querySelectorAll('.draggable-card').length;
+        const badge = zoneEl.querySelector('.count-badge');
+        if (badge) badge.textContent = `${count} mục`;
+      });
+    }
+
+    function verifyDragDropAnswer(q) {
+      const placedCount = Object.keys(zoneAssignments).length;
+      if (placedCount < q.items.length) {
+        showFeedback(false, 'Em chưa xếp hết các thẻ!', 'Hãy kéo thả hoặc chạm để xếp tất cả các hình ảnh vào đúng ô trước khi kiểm tra nhé!');
+        return;
+      }
+
+      let isAllCorrect = true;
+      q.items.forEach(item => {
+        const chosenTarget = zoneAssignments[item.id];
+        const cardEl = document.getElementById(`card-${item.id}`);
+        cardEl.draggable = false;
+        cardEl.onclick = null;
+
+        if (chosenTarget === item.type) {
+          cardEl.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-900');
+        } else {
+          isAllCorrect = false;
+          cardEl.classList.add('bg-rose-50', 'border-rose-500', 'text-rose-900');
+        }
+      });
+
+      if (isAllCorrect) {
+        sound.playCorrect();
+        score += 10;
+        correctCount++;
+        updateScoreUI();
+        showFeedback(true, 'Xuất sắc! Xếp đúng hoàn toàn!', q.explanation);
+      } else {
+        sound.playWrong();
+        showFeedback(false, 'Còn một số mục chưa chính xác!', q.explanation);
+      }
+
+      btnNext.textContent = 'Câu tiếp theo ➔';
+      btnNext.onclick = goToNextQuestion;
+    }
+
+    function showFeedback(isCorrect, title, message) {
+      feedbackBox.classList.remove('hidden');
+      if (isCorrect) {
+        feedbackBox.className = "mt-4 p-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 text-emerald-950 shadow-sm";
+        feedbackIcon.textContent = "🌟";
+        feedbackTitle.textContent = title;
+        feedbackTitle.className = "font-black text-emerald-800 text-base";
+      } else {
+        feedbackBox.className = "mt-4 p-4 rounded-2xl border-2 border-rose-300 bg-rose-50 text-rose-950 shadow-sm";
+        feedbackIcon.textContent = "💡";
+        feedbackTitle.textContent = title;
+        feedbackTitle.className = "font-black text-rose-800 text-base";
+      }
+      feedbackExplanation.textContent = message;
+    }
+
+    function goToNextQuestion() {
+      sound.playPop();
+      currentIndex++;
+      if (currentIndex < QUESTIONS_DATA.length) {
+        btnNext.textContent = 'Câu tiếp theo ➔';
+        btnNext.onclick = null;
+        loadQuestion(currentIndex);
+      } else {
+        showFinalResult();
+      }
+    }
+
+    function showFinalResult() {
+      screenGame.classList.add('hidden');
+      screenGame.classList.remove('flex');
+      screenResult.classList.remove('hidden');
+      screenResult.classList.add('flex');
+
+      document.getElementById('res-correct').textContent = `${correctCount} / ${QUESTIONS_DATA.length}`;
+      document.getElementById('res-score').textContent = score;
+
+      const titleEl = document.getElementById('result-title');
+      const subEl = document.getElementById('result-subtitle');
+      const badgeIconEl = document.getElementById('result-badge-icon');
+
+      if (score >= 80) {
+        sound.playVictory();
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 160, spread: 80, origin: { y: 0.6 } });
+        }
+        badgeIconEl.textContent = "🥇";
+        titleEl.textContent = "Xuất Sắc! Bậc Thầy Âm Thanh";
+        subEl.textContent = "Em đã nắm vững 100% các kiến thức về sự rung động, môi trường truyền âm và khoảng cách nghe âm thanh!";
+      } else if (score >= 60) {
+        sound.playVictory();
+        badgeIconEl.textContent = "🥈";
+        titleEl.textContent = "Làm Tốt Lắm! Chúc Mừng Em";
+        subEl.textContent = "Em đã hiểu rõ đa số các hiện tượng âm thanh trong đời sống. Hãy chơi lại để đạt điểm tuyệt đối nhé!";
+      } else {
+        badgeIconEl.textContent = "🌱";
+        titleEl.textContent = "Cố Gắng Thêm Chút Nữa Nhé!";
+        subEl.textContent = "Hãy cùng ôn lại 3 quy tắc ghi nhớ ở trang đầu và thử thách lại nào!";
+      }
+    }
+
+    window.onload = function() {
+      document.body.addEventListener('click', function initAudioOnce() {
+        sound.init();
+        document.body.removeEventListener('click', initAudioOnce);
+      }, { once: true });
+    };
+  </script>
+</body>
+</html>
